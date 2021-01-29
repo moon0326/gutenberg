@@ -1,0 +1,13 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types"
+	},
+	"references": [
+		{ "path": "../element" },
+		{ "path": "../hooks" },
+		{ "path": "../i18n" }
+	],
+	"include": [ "src/**/*" ]
+}
