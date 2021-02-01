@@ -54,7 +54,14 @@ module.exports = ( api ) => {
 	};
 
 	return {
-		presets: [ getPresetEnv() ],
+		presets: [
+			getPresetEnv(),
+			[
+				require.resolve( '@babel/preset-typescript' ),
+				// parse all extensions as TS mainly because Docgen doesn't pass filename info to parser
+				{ allExtensions: true, isTSX: true },
+			],
+		],
 		plugins: [
 			require.resolve( '@wordpress/warning/babel-plugin' ),
 			[
