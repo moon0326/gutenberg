@@ -33,6 +33,7 @@ import GlobalStylesProvider from './global-styles-provider';
 import NavigationSidebar from '../navigation-sidebar';
 import URLQueryController from '../url-query-controller';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
+import BlockNavigationSidebar from '../secondary-sidebar/block-navigation-sidebar';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),
@@ -50,6 +51,7 @@ function Editor() {
 		page,
 		template,
 		isNavigationOpen,
+		isBlockNavigationOpen,
 	} = useSelect( ( select ) => {
 		const {
 			isFeatureActive,
@@ -59,6 +61,7 @@ function Editor() {
 			getEditedPostId,
 			getPage,
 			isNavigationOpened,
+			isBlockNavigationOpened,
 		} = select( 'core/edit-site' );
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
@@ -82,6 +85,7 @@ function Editor() {
 				: null,
 			entityId: postId,
 			isNavigationOpen: isNavigationOpened(),
+			isBlockNavigationOpen: isBlockNavigationOpened(),
 		};
 	}, [] );
 	const { updateEditorSettings } = useDispatch( 'core/editor' );
@@ -169,9 +173,14 @@ function Editor() {
 											labels={ interfaceLabels }
 											drawer={ <NavigationSidebar /> }
 											secondarySidebar={
-												isInserterOpen && (
-													<InserterSidebar />
-												)
+												<>
+													{ isInserterOpen && (
+														<InserterSidebar />
+													) }
+													{ isBlockNavigationOpen && (
+														<BlockNavigationSidebar />
+													) }
+												</>
 											}
 											sidebar={
 												sidebarIsOpened && (

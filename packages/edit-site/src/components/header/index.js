@@ -3,16 +3,16 @@
  */
 import { useViewportMatch } from '@wordpress/compose';
 import {
-	BlockNavigationDropdown,
 	ToolSelector,
 	BlockToolbar,
 	__experimentalPreviewOptions as PreviewOptions,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
-import { _x } from '@wordpress/i18n';
+import { _x, __ } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
+import { SVG, Path } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -24,6 +24,17 @@ import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
 
+const MenuIcon = (
+	<SVG
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 24 24"
+		width="24"
+		height="24"
+	>
+		<Path d="M13.8 5.2H3v1.5h10.8V5.2zm-3.6 12v1.5H21v-1.5H10.2zm7.2-6H6.6v1.5h10.8v-1.5z" />
+	</SVG>
+);
+
 export default function Header( { openEntitiesSavedStates } ) {
 	const {
 		deviceType,
@@ -32,6 +43,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 		template,
 		templateType,
 		isInserterOpen,
+		isBlockNavigationOpen,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -39,6 +51,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 			getEditedPostType,
 			getEditedPostId,
 			isInserterOpened,
+			isBlockNavigationOpened,
 		} = select( 'core/edit-site' );
 		const { getEntityRecord } = select( 'core' );
 		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
@@ -60,12 +73,14 @@ export default function Header( { openEntitiesSavedStates } ) {
 			template: record,
 			templateType: postType,
 			isInserterOpen: isInserterOpened(),
+			isBlockNavigationOpen: isBlockNavigationOpened(),
 		};
 	}, [] );
 
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 		setIsInserterOpened,
+		setIsBlockNavigationOpened,
 	} = useDispatch( 'core/edit-site' );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -94,7 +109,18 @@ export default function Header( { openEntitiesSavedStates } ) {
 							<ToolSelector />
 							<UndoButton />
 							<RedoButton />
-							<BlockNavigationDropdown />
+							<Button
+								isPressed={ isBlockNavigationOpen }
+								className="edit-site-header-toolbar__block-navigation-toggle"
+								onClick={ () =>
+									setIsBlockNavigationOpened(
+										! isBlockNavigationOpen
+									)
+								}
+								icon={ MenuIcon }
+								/* translators: button label text should, if possible, be under 16 characters. */
+								label={ __( 'Outline' ) }
+							/>
 						</>
 					) }
 					{ displayBlockToolbar && (
