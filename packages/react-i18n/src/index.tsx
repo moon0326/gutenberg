@@ -10,7 +10,7 @@ import {
 } from '@wordpress/element';
 import { defaultI18n } from '@wordpress/i18n';
 import type { I18n } from '@wordpress/i18n';
-import type { ComponentType, ReactNode } from 'react';
+import type { ComponentType, PropsWithChildren } from 'react';
 import type { Subtract } from 'utility-types';
 
 interface I18nContextProps {
@@ -38,10 +38,7 @@ function makeContextValue( i18n: I18n ): I18nContextProps {
 
 const I18nContext = createContext( makeContextValue( defaultI18n ) );
 
-interface I18nProviderProps {
-	i18n: I18n;
-	children: ReactNode;
-}
+type I18nProviderProps = PropsWithChildren< { i18n: I18n } >;
 
 export function I18nProvider( props: I18nProviderProps ) {
 	const { children, i18n = defaultI18n } = props;
