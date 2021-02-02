@@ -51,7 +51,6 @@ function Editor() {
 		page,
 		template,
 		isNavigationOpen,
-		isBlockNavigationOpen,
 	} = useSelect( ( select ) => {
 		const {
 			isFeatureActive,
@@ -61,7 +60,6 @@ function Editor() {
 			getEditedPostId,
 			getPage,
 			isNavigationOpened,
-			isBlockNavigationOpened,
 		} = select( 'core/edit-site' );
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
@@ -85,7 +83,6 @@ function Editor() {
 				: null,
 			entityId: postId,
 			isNavigationOpen: isNavigationOpened(),
-			isBlockNavigationOpen: isBlockNavigationOpened(),
 		};
 	}, [] );
 	const { updateEditorSettings } = useDispatch( 'core/editor' );
@@ -177,9 +174,7 @@ function Editor() {
 													{ isInserterOpen && (
 														<InserterSidebar />
 													) }
-													{ isBlockNavigationOpen && (
-														<BlockNavigationSidebar />
-													) }
+													<BlockNavigationSidebar />
 												</>
 											}
 											sidebar={
