@@ -3,7 +3,12 @@
  */
 import { createI18n } from './create-i18n';
 
-const i18n = createI18n( undefined, undefined );
+/**
+ * WordPress dependencies
+ */
+import { defaultHooks } from '@wordpress/hooks';
+
+const i18n = createI18n( undefined, undefined, defaultHooks );
 
 /**
  * Default, singleton instance of `I18n`.

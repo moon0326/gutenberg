@@ -4,11 +4,6 @@
 import Tannin from 'tannin';
 
 /**
- * WordPress dependencies
- */
-import { defaultHooks } from '@wordpress/hooks';
-
-/**
  * @typedef {Record<string,any>} LocaleData
  */
 
@@ -135,11 +130,7 @@ const I18N_HOOK_REGEXP = /^i18n\.(n?)gettext(_|$)/;
  * @param {Hooks} [hooks]     Hooks implementation.
  * @return {I18n}                       I18n instance
  */
-export const createI18n = (
-	initialData,
-	initialDomain,
-	hooks = defaultHooks
-) => {
+export const createI18n = ( initialData, initialDomain, hooks ) => {
 	/**
 	 * The underlying instance of Tannin to which exported functions interface.
 	 *
@@ -223,16 +214,15 @@ export const createI18n = (
 	};
 
 	/** @type {GetFilterDomain} */
-	const getFilterDomain = ( domain ) => {
-		if ( typeof domain === 'undefined' ) {
-			return 'default';
-		}
-		return domain;
-	};
+	const getFilterDomain = ( domain = 'default' ) => domain;
 
 	/** @type {__} */
 	const __ = ( text, domain ) => {
 		let translation = dcnpgettext( domain, undefined, text );
+		if ( ! hooks ) {
+			return translation;
+		}
+
 		/**
 		 * Filters text with its translation.
 		 *
@@ -240,9 +230,6 @@ export const createI18n = (
 		 * @param {string} text        Text to translate.
 		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
 		 */
-		if ( typeof hooks === 'undefined' ) {
-			return translation;
-		}
 		translation = /** @type {string} */ (
 			/** @type {*} */ hooks.applyFilters(
 				'i18n.gettext',
@@ -264,6 +251,10 @@ export const createI18n = (
 	/** @type {_x} */
 	const _x = ( text, context, domain ) => {
 		let translation = dcnpgettext( domain, context, text );
+		if ( ! hooks ) {
+			return translation;
+		}
+
 		/**
 		 * Filters text with its translation based on context information.
 		 *
@@ -272,9 +263,6 @@ export const createI18n = (
 		 * @param {string} context     Context information for the translators.
 		 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
 		 */
-		if ( typeof hooks === 'undefined' ) {
-			return translation;
-		}
 		translation = /** @type {string} */ (
 			/** @type {*} */ hooks.applyFilters(
 				'i18n.gettext_with_context',
@@ -304,9 +292,10 @@ export const createI18n = (
 			plural,
 			number
 		);
-		if ( typeof hooks === 'undefined' ) {
+		if ( ! hooks ) {
 			return translation;
 		}
+
 		/**
 		 * Filters the singular or plural form of a string.
 		 *
@@ -347,9 +336,10 @@ export const createI18n = (
 			plural,
 			number
 		);
-		if ( typeof hooks === 'undefined' ) {
+		if ( ! hooks ) {
 			return translation;
 		}
+
 		/**
 		 * Filters the singular or plural form of a string with gettext context.
 		 *
@@ -403,17 +393,19 @@ export const createI18n = (
 		setLocaleData( initialData, initialDomain );
 	}
 
-	/**
-	 * @param {string} hookName
-	 */
-	const onHookAddedOrRemoved = ( hookName ) => {
-		if ( I18N_HOOK_REGEXP.test( hookName ) ) {
-			notifyListeners();
-		}
-	};
+	if ( hooks ) {
+		/**
+		 * @param {string} hookName
+		 */
+		const onHookAddedOrRemoved = ( hookName ) => {
+			if ( I18N_HOOK_REGEXP.test( hookName ) ) {
+				notifyListeners();
+			}
+		};
 
-	hooks.addAction( 'hookAdded', 'core/i18n', onHookAddedOrRemoved );
-	hooks.addAction( 'hookRemoved', 'core/i18n', onHookAddedOrRemoved );
+		hooks.addAction( 'hookAdded', 'core/i18n', onHookAddedOrRemoved );
+		hooks.addAction( 'hookRemoved', 'core/i18n', onHookAddedOrRemoved );
+	}
 
 	return {
 		getLocaleData,
