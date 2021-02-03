@@ -268,7 +268,21 @@ describe( 'i18n filters', () => {
 			( translation, single, plural, number, context ) =>
 				translation + `/i18n.ngettext_with_${ context }_domain`
 		);
+		hooks.addFilter(
+			'i18n.hasTranslation',
+			'test',
+			( hasTranslation, single, context, domain ) => {
+				if (
+					single === 'Always' &&
+					! context &&
+					domain === 'default'
+				) {
+					return true;
+				}
 
+				return hasTranslation;
+			}
+		);
 		return hooks;
 	}
 
@@ -330,6 +344,17 @@ describe( 'i18n filters', () => {
 		expect( i18n._nx( 'hello', 'hellos', 2, 'ctx', 'domain' ) ).toEqual(
 			'hellos/i18n.ngettext_with_ctx/i18n.ngettext_with_ctx_domain'
 		);
+	} );
+
+	test( 'hasTranslation() calls filters', () => {
+		const hooks = createHooksWithI18nFilters();
+		const { hasTranslation } = createI18n( frenchLocale, undefined, hooks );
+
+		expect( hasTranslation( 'hello' ) ).toBe( true );
+		expect( hasTranslation( 'hello', 'not a greeting' ) ).toBe( false );
+		expect( hasTranslation( 'Always' ) ).toBe( true );
+		expect( hasTranslation( 'Always', 'other context' ) ).toBe( false );
+		expect( hasTranslation( 'Always', undefined, 'domain' ) ).toBe( false );
 	} );
 } );
 

@@ -381,12 +381,39 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 	};
 
 	/** @type {HasTranslation} */
-	const hasTranslation = ( singular, context, domain = 'default' ) => {
-		const key =
-			typeof context === 'string'
-				? context + '\u0004' + singular
-				: singular;
-		return tannin.data[ domain ] && key in tannin.data[ domain ];
+	const hasTranslation = ( single, context, domain = 'default' ) => {
+		const key = context ? context + '\u0004' + single : single;
+		let result = !! tannin.data?.[ domain ]?.[ key ];
+		if ( hooks ) {
+			/**
+			 * Filters the presence of a translation in the locale data.
+			 *
+			 * @param {boolean} hasTranslation Whether the translation is present or not..
+			 * @param {string} single The singular form of the translated text (used as key in locale data)
+			 * @param {string} context Context information for the translators.
+			 * @param {string} domain Text domain. Unique identifier for retrieving translated strings.
+			 */
+			result = /** @type { boolean } */ (
+				/** @type {*} */ hooks.applyFilters(
+					'i18n.hasTranslation',
+					result,
+					single,
+					context,
+					domain
+				)
+			);
+
+			result = /** @type { boolean } */ (
+				/** @type {*} */ hooks.applyFilters(
+					'i18n.hasTranslation_' + getFilterDomain( domain ),
+					result,
+					single,
+					context,
+					domain
+				)
+			);
+		}
+		return result;
 	};
 
 	if ( initialData ) {
